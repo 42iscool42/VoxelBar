@@ -1,0 +1,60 @@
+apply plugin: 'java'
+apply plugin: 'maven'
+// Plugins for IDE project generation
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+
+group = 'com.thevoxelbox'
+archivesBaseName = 'VoxelBar'
+version = '2.0.0'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    maven {
+        url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
+
+        // As of Gradle 5.1, you can limit this to only those
+        // dependencies you expect from it
+        content {
+            includeGroup 'org.bukkit'
+        }
+    }
+    /*
+     As Spigot-API depends on the Bungeecord ChatComponent-API,
+    we need to add the Sonatype OSS repository, as Gradle,
+    in comparison to maven, doesn't want to understand the ~/.m2
+    directory unless added using mavenLocal(). Maven usually just gets
+    it from there, as most people have run the BuildTools at least once.
+    This is therefore not needed if you're using the full Spigot/CraftBukkit,
+    or if you're using the Bukkit API.
+    */
+    maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
+    maven { url = 'https://oss.sonatype.org/content/repositories/central' }
+    mavenLocal() // This is needed for CraftBukkit and Spigot.
+    mavenCentral()
+}
+
+sourceSets {
+    main {
+        resources {
+            srcDirs "src/main/resources"
+        }
+    }
+}
+
+// Source compiler configuration
+tasks.withType(JavaCompile) {
+    options.compilerArgs += ['-Xlint:all', '-Xlint:-path']
+    options.deprecation = true
+    options.encoding = 'UTF-8'
+}
+
+dependencies {
+    compile 'org.bukkit:bukkit:1.15.2-R0.1-SNAPSHOT' // The Bukkit API with no shadowing.
+}
+
+wrapper {
+    gradleVersion = '5.6.2'
+}
